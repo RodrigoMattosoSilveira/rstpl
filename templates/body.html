@@ -12,6 +12,10 @@
     rel="stylesheet"
   />
 
+  <!-- App CSS -->
+  <link rel="stylesheet" href="style.css"
+    rel="stylesheet"
+  />
   <!-- Bootstrap Icons -->
   <link
     href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
@@ -111,7 +115,7 @@
         <div class="company-logo">
           <i class="bi bi-building"></i>
         </div>
-        <div class="company-name">My Company</div>
+        <div class="company-name">{{ .Tenant }}</div>
       </div>
 
       <!-- Right: Profile Dropdown -->
@@ -169,7 +173,7 @@
 
   <!-- Footer -->
   <footer>
-    <small>&copy; 2025 My Company. All rights reserved.</small>
+    <small>&copy; 2025 {{ .Host }}. All rights reserved.</small>
   </footer>
 
   <!-- Bootstrap JS -->

@@ -73,23 +73,21 @@ func main() {
 	})
 
 	r.GET("/welcome", func(c *gin.Context) {
-		render_(c, "welcome.html", gin.H{
-			"Title":   "Welcome",
-			"ShowNav": false,
-		})
+		render_(c, "welcome.html", buildPipeline())
 	})
+
 	r.GET("/bemvindo", func(c *gin.Context) {
-		render_(c, "bemvindo.html", gin.H{
-			"Title":   "Bem Vindo",
-			"ShowNav": false,
-		})
+		render_(c, "bemvindo.html", buildPipeline())
 	})
 
 	r.Run(":8080")
 }
-
-// Helper: Parse all templates with layout support
-func loadTemplates(templatesDir string) *template.Template {
-	tmpl := template.Must(template.ParseGlob(templatesDir + "/*.html"))
-	return tmpl
+/*
+ * An attempt to consilidate data for template rendering
+ */
+func buildPipeline() gin.H {
+	return gin.H{
+		"Tenant": "MC",
+		"Host": "Madrone Logistics",
+	}
 }
