@@ -1,28 +1,52 @@
 package main
 
-// see https://www.calhoun.io/intro-to-templates-p4-v-in-mvc/
-
 import (
-  "net/http"
-  "github.com/RodrigoMattosoSilveira/rstpl/views"
+	"html/template"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-var index *views.View
-var contact *views.View
-
 func main() {
-  index = views.NewView("bootstrap", "views/index.html")
-  contact = views.NewView("bootstrap", "views/contact.html")
+	r := gin.Default()
 
-  http.HandleFunc("/", indexHandler)
-  http.HandleFunc("/contact", contactHandler)
-  http.ListenAndServe(":3000", nil)
+	// Serve static assets if you have them (optional)
+	r.Static("/static", "./static")
+
+	// Load all templates
+	r.SetHTMLTemplate(loadTemplates("./templates"))
+
+	// Routes
+	r.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "home.html", gin.H{"Title": "Home"})
+	})
+
+	r.GET("/about", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "about.html", gin.H{"Title": "About"})
+	})
+
+	r.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.html", gin.H{"Title": "Login"})
+	})
+
+	r.GET("/body", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "body.html", gin.H{"Title": "Login"})
+	})
+
+	r.GET("/welcome", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "welcome.html", gin.H{"Title": "Login"})
+	})
+
+
+	r.GET("/bemvindo", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "bemvindo.html", gin.H{"Title": "Login"})
+	})
+
+	r.Run(":8080")
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-  index.Render(w, nil)
-}
-
-func contactHandler(w http.ResponseWriter, r *http.Request) {
-  contact.Render(w, nil)
+// Helper: Parse all templates with layout support
+func loadTemplates(templatesDir string) *template.Template {
+	tmpl := template.Must(template.ParseGlob(templatesDir + "/*.html"))
+	return tmpl
 }
