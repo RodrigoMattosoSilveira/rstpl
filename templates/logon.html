@@ -1,54 +1,52 @@
-   {{ define "content" }}
+{{ define "main-content" }}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 85vh;">
+  <div class="card shadow p-4" style="max-width: 500px; width: 100%;">
+    <div class="text-center mb-4">
+      <div class="company-logo bg-primary bg-opacity-25 rounded-circle d-inline-flex align-items-center justify-content-center" style="width:48px; height:48px;">
+        <i class="bi bi-person-plus fs-4 text-primary"></i>
+      </div>
+      <h3 class="mt-2">Register a new Account</h3>
+      <p class="text-muted mb-0">Fill in your details below</p>
+    </div>
 
- <div class="login-card"></div>
-   <form>
-      <!-- Email input with icon -->
+    <form method="POST" action="/register">
       <div class="mb-3">
-        <label for="email" class="form-label">Email address</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-          <input
-            type="email"
-            class="form-control"
-            id="email"
-            placeholder="Enter email"
-            required
-          />
-        </div>
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-control" name="fullname" required>
       </div>
 
-      <!-- Password input with icon -->
       <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
-        <div class="input-group">
-          <span class="input-group-text"><i class="bi bi-lock"></i></span>
-          <input
-            type="password"
-            class="form-control"
-            id="password"
-            placeholder="Enter password"
-            required
-          />
-        </div>
+        <label class="form-label">Address</label>
+        <input type="text" class="form-control" name="address" required>
       </div>
 
-      <!-- Remember me checkbox -->
-      <div class="mb-3 form-check">
-        <input type="checkbox" class="form-check-input" id="remember" />
-        <label class="form-check-label" for="remember">Remember me</label>
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" class="form-control" name="email" required>
       </div>
 
-      <!-- Submit button -->
-      <button type="submit" class="btn btn-primary w-100">
-        <i class="bi bi-box-arrow-in-right me-1"></i> Login
-      </button>
+      <div class="mb-3">
+        <label class="form-label">Cell Phone</label>
+        <input type="tel" class="form-control" name="cell" required placeholder="+1 (555) 123-4567">
+      </div>
 
-      <!-- Links -->
-      <div class="d-flex justify-content-between mt-3">
-        <a href="#" class="small">Forgot password?</a>
-        <a href="#" class="small">Sign up</a>
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-control" name="password" required>
+      </div>
+
+      <div class="d-grid">
+        <button type="submit" class="btn btn-primary">Register</button>
       </div>
     </form>
+
+    <div class="text-center mt-3">
+      <small class="text-muted">Already have an account?
+        <a href="/login" class="text-decoration-none">Log in</a>
+      </small>
+    </div>
+  </div>
 </div>
 {{ end }}
-{{ template "layout" . }}
+
+{{ template "body" . }}

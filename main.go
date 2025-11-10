@@ -59,8 +59,12 @@ func main() {
 		render_(c, "bemvindo.html", buildPipeline())
 	})
 
+	r.GET("/login", func(c *gin.Context) {
+		render_(c, "login.html", buildPipeline())
+	})
+
 	r.GET("/logon", func(c *gin.Context) {
-		render_(c, "register.html", buildPipeline())
+		render_(c, "logon.html", buildPipeline())
 	})
 
 	r.Run(":8080")
