@@ -51,33 +51,16 @@ func main() {
 		})
 	})
 
-	r.GET("/login", func(c *gin.Context) {
-		render(c, "login.html", gin.H{
-			"Title":   "Login",
-			"ShowNav": false,
-		})
-	})
-
-	// Registration page
-	r.GET("/register", func(c *gin.Context) {
-		render(c, "register.html", gin.H{
-			"Title":   "Register",
-			"ShowNav": false,
-		})
-	})
-	r.GET("/logon", func(c *gin.Context) {
-		render(c, "logon.html", gin.H{
-			"Title":   "Register",
-			"ShowNav": false,
-		})
-	})
-
 	r.GET("/welcome", func(c *gin.Context) {
 		render_(c, "welcome.html", buildPipeline())
 	})
 
 	r.GET("/bemvindo", func(c *gin.Context) {
 		render_(c, "bemvindo.html", buildPipeline())
+	})
+
+	r.GET("/logon", func(c *gin.Context) {
+		render_(c, "register.html", buildPipeline())
 	})
 
 	r.Run(":8080")
