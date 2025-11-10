@@ -1,0 +1,54 @@
+   {{ define "content" }}
+
+ <div class="login-card"></div>
+   <form>
+      <!-- Email input with icon -->
+      <div class="mb-3">
+        <label for="email" class="form-label">Email address</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+          <input
+            type="email"
+            class="form-control"
+            id="email"
+            placeholder="Enter email"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Password input with icon -->
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            placeholder="Enter password"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Remember me checkbox -->
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="remember" />
+        <label class="form-check-label" for="remember">Remember me</label>
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="btn btn-primary w-100">
+        <i class="bi bi-box-arrow-in-right me-1"></i> Login
+      </button>
+
+      <!-- Links -->
+      <div class="d-flex justify-content-between mt-3">
+        <a href="#" class="small">Forgot password?</a>
+        <a href="#" class="small">Sign up</a>
+      </div>
+    </form>
+</div>
+{{ end }}
+{{ template "layout" . }}

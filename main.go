@@ -58,6 +58,20 @@ func main() {
 		})
 	})
 
+	// Registration page
+	r.GET("/register", func(c *gin.Context) {
+		render(c, "register.html", gin.H{
+			"Title":   "Register",
+			"ShowNav": false,
+		})
+	})
+	r.GET("/logon", func(c *gin.Context) {
+		render(c, "logon.html", gin.H{
+			"Title":   "Register",
+			"ShowNav": false,
+		})
+	})
+
 	r.GET("/welcome", func(c *gin.Context) {
 		render_(c, "welcome.html", gin.H{
 			"Title":   "Welcome",
