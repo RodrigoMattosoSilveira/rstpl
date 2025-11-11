@@ -7,34 +7,49 @@ import (
 	"github.com/gin-gonic/gin"
 	"path/filepath"
 )
+// Helper: renders a view with layout and partials
+func render (c *gin.Context, tmpl string, data gin.H) {
+	var layout string
+	var layoutStr string
+	route := c.FullPath()
 
+	switch route {
+	case "/":
+		layout = "layout.html"
+		layoutStr = "layout"
+	case "/about":
+		layout = "layout.html"
+		layoutStr = "layout"
+	case "/welcome":
+		layout = "body.html"
+		layoutStr = "body"
+	case "/bemvindo":
+		layout = "body.html"
+		layoutStr = "body"
+	case "/login":
+		layout = "body.html"
+		layoutStr = "body"
+	case "/logon":
+		layout = "body.html"
+		layoutStr = "body"
+	default:
+		layout = "layout.html"
+		layoutStr = "layout"
+	}
+	files := []string{
+		filepath.Join("templates", layout),
+		filepath.Join("templates", tmpl),
+	}
+	t := template.Must(template.ParseFiles(files...))
+	c.Status(http.StatusOK)
+	t.ExecuteTemplate(c.Writer, layoutStr, data)
+}
 func main() {
 	r := gin.Default()
 
-	// Serve static assets if you have them (optional)
+	// Serve static assets if you have them (optional) 
 	r.Static("/static", "./static")
-	// Helper: renders a view with layout and partials
-	render := func(c *gin.Context, tmpl string, data gin.H) {
-		files := []string{
-			filepath.Join("templates", "layout.html"),
-			filepath.Join("templates", "header.html"),
-			filepath.Join("templates", "sidebar.html"),
-			filepath.Join("templates", "footer.html"),
-			filepath.Join("templates", tmpl),
-		}
-		t := template.Must(template.ParseFiles(files...))
-		c.Status(http.StatusOK)
-		t.ExecuteTemplate(c.Writer, "layout", data)
-	}
-	render_ := func(c *gin.Context, tmpl string, data gin.H) {
-		files := []string{
-			filepath.Join("templates", "body.html"),
-			filepath.Join("templates", tmpl),
-		}
-		t := template.Must(template.ParseFiles(files...))
-		c.Status(http.StatusOK)
-		t.ExecuteTemplate(c.Writer, "body", data)
-	}
+
 	// Routes
 	r.GET("/", func(c *gin.Context) {
 		render(c, "home.html", gin.H{
@@ -42,7 +57,6 @@ func main() {
 			"ShowNav": true,
 		})
 	})
-
 
 	r.GET("/about", func(c *gin.Context) {
 		render (c, "about.html", gin.H{
@@ -52,19 +66,19 @@ func main() {
 	})
 
 	r.GET("/welcome", func(c *gin.Context) {
-		render_(c, "welcome.html", buildPipeline())
+		render(c, "welcome.html", buildPipeline())
 	})
 
 	r.GET("/bemvindo", func(c *gin.Context) {
-		render_(c, "bemvindo.html", buildPipeline())
+		render(c, "bemvindo.html", buildPipeline())
 	})
 
 	r.GET("/login", func(c *gin.Context) {
-		render_(c, "login.html", buildPipeline())
+		render(c, "login.html", buildPipeline())
 	})
 
 	r.GET("/logon", func(c *gin.Context) {
-		render_(c, "logon.html", buildPipeline())
+		render(c, "logon.html", buildPipeline())
 	})
 
 	r.Run(":8080")
