@@ -3,46 +3,74 @@ package main
 import (
 	"html/template"
 	"net/http"
+	"sync"
+
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
-	"path/filepath"
 )
+
 // Helper: renders a view with layout and partials
-func render (c *gin.Context, tmpl string, data gin.H) {
+// templateCache avoids re-parsing templates repeatedly
+var templateCache = struct {
+	mu   sync.RWMutex
+	data map[string]*template.Template
+}{
+	data: make(map[string]*template.Template),
+}
+
+func render (c *gin.Context, partial string, data gin.H) {
 	var layout string
-	var layoutStr string
+	var layoutName string
 	route := c.FullPath()
 
 	switch route {
 	case "/":
 		layout = "layout.html"
-		layoutStr = "layout"
+		layoutName = "layout"
 	case "/about":
 		layout = "layout.html"
-		layoutStr = "layout"
+		layoutName = "layout"
 	case "/welcome":
 		layout = "body.html"
-		layoutStr = "body"
+		layoutName = "body"
 	case "/bemvindo":
 		layout = "body.html"
-		layoutStr = "body"
+		layoutName = "body"
 	case "/login":
 		layout = "body.html"
-		layoutStr = "body"
+		layoutName = "body"
 	case "/logon":
 		layout = "body.html"
-		layoutStr = "body"
+		layoutName = "body"
 	default:
 		layout = "layout.html"
-		layoutStr = "layout"
+		layoutName = "layout"
 	}
-	files := []string{
-		filepath.Join("templates", layout),
-		filepath.Join("templates", tmpl),
+	// Key for cache
+	key := layout + "|" + partial
+
+	// Try cached template
+	templateCache.mu.RLock()
+	t, ok := templateCache.data[key]
+	templateCache.mu.RUnlock()
+
+	if !ok {
+		files := []string{
+			filepath.Join("templates", layout),
+			filepath.Join("templates", partial),
+		}
+		t = template.Must(template.ParseFiles(files...))
+		templateCache.mu.Lock()
+		templateCache.data[key] = t
+		templateCache.mu.Unlock()
 	}
-	t := template.Must(template.ParseFiles(files...))
+
+	// Execute template using its defined name (not filename)
 	c.Status(http.StatusOK)
-	t.ExecuteTemplate(c.Writer, layoutStr, data)
+	if err := t.ExecuteTemplate(c.Writer, layoutName, data); err != nil {
+		c.String(http.StatusInternalServerError, "template error: %v", err)
+	}
 }
 func main() {
 	r := gin.Default()
