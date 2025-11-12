@@ -1,70 +1,45 @@
 package main
 
 import (
-	"html/template"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
-	"path/filepath"
+	"github.com/RodrigoMattosoSilveira/rstpl/internal/utils"
 )
 
 func main() {
 	r := gin.Default()
 
-	// Serve static assets if you have them (optional)
+	// Serve static assets if you have them (optional) 
 	r.Static("/static", "./static")
-	// Helper: renders a view with layout and partials
-	render := func(c *gin.Context, tmpl string, data gin.H) {
-		files := []string{
-			filepath.Join("templates", "layout.html"),
-			filepath.Join("templates", "header.html"),
-			filepath.Join("templates", "sidebar.html"),
-			filepath.Join("templates", "footer.html"),
-			filepath.Join("templates", tmpl),
-		}
-		t := template.Must(template.ParseFiles(files...))
-		c.Status(http.StatusOK)
-		t.ExecuteTemplate(c.Writer, "layout", data)
-	}
-	render_ := func(c *gin.Context, tmpl string, data gin.H) {
-		files := []string{
-			filepath.Join("templates", "body.html"),
-			filepath.Join("templates", tmpl),
-		}
-		t := template.Must(template.ParseFiles(files...))
-		c.Status(http.StatusOK)
-		t.ExecuteTemplate(c.Writer, "body", data)
-	}
+
 	// Routes
 	r.GET("/", func(c *gin.Context) {
-		render(c, "home.html", gin.H{
+		utils.Render(c, "home.html", gin.H{
 			"Title":   "Home",
 			"ShowNav": true,
 		})
 	})
 
-
 	r.GET("/about", func(c *gin.Context) {
-		render (c, "about.html", gin.H{
+		utils.Render (c, "about.html", gin.H{
 			"Title":   "Home",
 			"ShowNav": true,
 		})
 	})
 
 	r.GET("/welcome", func(c *gin.Context) {
-		render_(c, "welcome.html", buildPipeline())
+		utils.Render(c, "welcome.html", buildPipeline())
 	})
 
 	r.GET("/bemvindo", func(c *gin.Context) {
-		render_(c, "bemvindo.html", buildPipeline())
+		utils.Render(c, "bemvindo.html", buildPipeline())
 	})
 
 	r.GET("/login", func(c *gin.Context) {
-		render_(c, "login.html", buildPipeline())
+		utils.Render(c, "login.html", buildPipeline())
 	})
 
 	r.GET("/logon", func(c *gin.Context) {
-		render_(c, "logon.html", buildPipeline())
+		utils.Render(c, "logon.html", buildPipeline())
 	})
 
 	r.Run(":8080")
