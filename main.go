@@ -1,77 +1,10 @@
 package main
 
 import (
-	"html/template"
-	"net/http"
-	"sync"
-
-	"path/filepath"
-
 	"github.com/gin-gonic/gin"
+	"github.com/RodrigoMattosoSilveira/rstpl/internal/utils"
 )
 
-// Helper: renders a view with layout and partials
-// templateCache avoids re-parsing templates repeatedly
-var templateCache = struct {
-	mu   sync.RWMutex
-	data map[string]*template.Template
-}{
-	data: make(map[string]*template.Template),
-}
-
-func render (c *gin.Context, partial string, data gin.H) {
-	var layout string
-	var layoutName string
-	route := c.FullPath()
-
-	switch route {
-	case "/":
-		layout = "layout.html"
-		layoutName = "layout"
-	case "/about":
-		layout = "layout.html"
-		layoutName = "layout"
-	case "/welcome":
-		layout = "body.html"
-		layoutName = "body"
-	case "/bemvindo":
-		layout = "body.html"
-		layoutName = "body"
-	case "/login":
-		layout = "body.html"
-		layoutName = "body"
-	case "/logon":
-		layout = "body.html"
-		layoutName = "body"
-	default:
-		layout = "layout.html"
-		layoutName = "layout"
-	}
-	// Key for cache
-	key := layout + "|" + partial
-
-	// Try cached template
-	templateCache.mu.RLock()
-	t, ok := templateCache.data[key]
-	templateCache.mu.RUnlock()
-
-	if !ok {
-		files := []string{
-			filepath.Join("templates", layout),
-			filepath.Join("templates", partial),
-		}
-		t = template.Must(template.ParseFiles(files...))
-		templateCache.mu.Lock()
-		templateCache.data[key] = t
-		templateCache.mu.Unlock()
-	}
-
-	// Execute template using its defined name (not filename)
-	c.Status(http.StatusOK)
-	if err := t.ExecuteTemplate(c.Writer, layoutName, data); err != nil {
-		c.String(http.StatusInternalServerError, "template error: %v", err)
-	}
-}
 func main() {
 	r := gin.Default()
 
@@ -80,33 +13,33 @@ func main() {
 
 	// Routes
 	r.GET("/", func(c *gin.Context) {
-		render(c, "home.html", gin.H{
+		utils.Render(c, "home.html", gin.H{
 			"Title":   "Home",
 			"ShowNav": true,
 		})
 	})
 
 	r.GET("/about", func(c *gin.Context) {
-		render (c, "about.html", gin.H{
+		utils.Render (c, "about.html", gin.H{
 			"Title":   "Home",
 			"ShowNav": true,
 		})
 	})
 
 	r.GET("/welcome", func(c *gin.Context) {
-		render(c, "welcome.html", buildPipeline())
+		utils.Render(c, "welcome.html", buildPipeline())
 	})
 
 	r.GET("/bemvindo", func(c *gin.Context) {
-		render(c, "bemvindo.html", buildPipeline())
+		utils.Render(c, "bemvindo.html", buildPipeline())
 	})
 
 	r.GET("/login", func(c *gin.Context) {
-		render(c, "login.html", buildPipeline())
+		utils.Render(c, "login.html", buildPipeline())
 	})
 
 	r.GET("/logon", func(c *gin.Context) {
-		render(c, "logon.html", buildPipeline())
+		utils.Render(c, "logon.html", buildPipeline())
 	})
 
 	r.Run(":8080")
