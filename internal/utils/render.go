@@ -106,6 +106,12 @@ func RenderPage(c *gin.Context, partials []TmplPartial, data gin.H) {
 	}
 
 	// 4. Execute the template.
+	// Send it to console to debug
+	// err = tmpl.ExecuteTemplate(os.Stdout, "layout", data)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
 	err = tmpl.Execute(c.Writer, data)
 	if err != nil {
 		log.Printf("ERROR: Failed to execute template '%s': %v", "layout", err)
@@ -120,7 +126,13 @@ func ReadTemplateFile(tmpl TmplPartial) string {
 		log.Fatal(err)
 	}
 	// templateStr := tmpl.Prefix + string(content) + "\n" + "{{ end }}"
-	templateStr := "\n" + tmpl.Prefix + "\n" + string(content)+ "\n"  + "{{ end }}"
+	// templateStr := "\n" + tmpl.Prefix + "\n" + string(content)+ "\n"  + "{{ end }}"
+	templateStr := derivePrefix(tmpl.Name) + string(content)+ "\n"  + "{{ end }}"
 	log.Println(templateStr)
 	return templateStr
+}
+
+func derivePrefix(name string) string {
+	// Prefix: `{{ define "bottom" }}`
+	return  "\n" +  `{{ define "` + name + `" }}`+ "\n"
 }
