@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/RodrigoMattosoSilveira/rstpl/internal/utils"
+
 )
 
 func main() {
@@ -42,6 +43,22 @@ func main() {
 		utils.Render(c, "logon.html", buildPipeline())
 	})
 
+	r.GET("/welcome_login", func(c *gin.Context) {
+		var partials = []utils.TmplPartial{
+			{Name: "layout", Fn: "layout.html",  Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
+			{Name: "bottom",    Fn: "welcome.html", Prefix: `{{ define "bottom" }}`,    FullName: "", FileStr: ""},
+			{Name: "top", Fn: "cc.tmpl",      Prefix: `{{ define "top" }}`, FullName: "", FileStr: ""},		
+		}
+
+		// Call our custom renderer.
+		// The name "layout.tmpl" tells the template engine which template definition to execute first.
+		data := gin.H{
+			"Tenant": "MC",
+			"Host":   "Madone Logistics",
+		}
+		utils.RenderPage(c, partials, data)
+	})
+	
 	r.Run(":8080")
 }
 /*
