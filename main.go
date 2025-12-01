@@ -1,72 +1,77 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/RodrigoMattosoSilveira/rstpl/internal/utils"
+	"log"
 
+	"github.com/RodrigoMattosoSilveira/rstpl/internal/utils"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
-	r := gin.Default()
+	app := fiber.New()
+	app.Use(logger.New())
 
-	// Serve static assets if you have them (optional) 
-	r.Static("/static", "./static")
+	// Serve static assets if you have them (optional)
+	app.Static("/static", "./static")
 
 	// Routes
-	r.GET("/", func(c *gin.Context) {
-		utils.Render(c, "home.html", gin.H{
+	app.Get("/", func(c *fiber.Ctx) error {
+		utils.Render(c, "home.html", fiber.Map{
+			"Title":   "Home",
+			"ShowNav": true,
+		})
+		return nil
+	})
+
+	app.Get("/about", func(c *fiber.Ctx) error {
+		return utils.Render(c, "about.html", fiber.Map{
 			"Title":   "Home",
 			"ShowNav": true,
 		})
 	})
 
-	r.GET("/about", func(c *gin.Context) {
-		utils.Render (c, "about.html", gin.H{
-			"Title":   "Home",
-			"ShowNav": true,
-		})
+	app.Get("/welcome", func(c *fiber.Ctx) error {
+		return utils.Render(c, "welcome.html", buildPipeline())
 	})
 
-	r.GET("/welcome", func(c *gin.Context) {
-		utils.Render(c, "welcome.html", buildPipeline())
+	app.Get("/bemvindo", func(c *fiber.Ctx) error {
+		return utils.Render(c, "bemvindo.html", buildPipeline())
 	})
 
-	r.GET("/bemvindo", func(c *gin.Context) {
-		utils.Render(c, "bemvindo.html", buildPipeline())
+	app.Get("/login", func(c *fiber.Ctx) error {
+		return utils.Render(c, "lofiber.Maptml", buildPipeline())
 	})
 
-	r.GET("/login", func(c *gin.Context) {
-		utils.Render(c, "login.html", buildPipeline())
+	app.Get("/logon", func(c *fiber.Ctx) error {
+		return utils.Render(c, "logon.html", buildPipeline())
 	})
 
-	r.GET("/logon", func(c *gin.Context) {
-		utils.Render(c, "logon.html", buildPipeline())
-	})
-
-	r.GET("/welcome_login", func(c *gin.Context) {
-		var partials = []utils.TmplPartial{
-			{Name: "layout", Fn: "layout.html",  Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
-			{Name: "bottom",    Fn: "welcome.html", Prefix: `{{ define "bottom" }}`,    FullName: "", FileStr: ""},
-			{Name: "top", Fn: "cc.tmpl",      Prefix: `{{ define "top" }}`, FullName: "", FileStr: ""},		
+	app.Get("/welcome_login", func(c *fiber.Ctx) error {
+		var partials = []utils.TmplPartial {
+			{Name: "layout", Fn: "layout.html", Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
+			{Name: "top", Fn: "welcome.html", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
+			{Name: "bottom",    Fn: "cc.tmpl", Prefix: `{{ define "top" }}`, FullName: "", FileStr: ""},
 		}
 
 		// Call our custom renderer.
 		// The name "layout.tmpl" tells the template engine which template definition to execute first.
-		data := gin.H{
+		data := fiber.Map{
 			"Tenant": "MC",
 			"Host":   "Madone Logistics",
 		}
-		utils.RenderPage(c, partials, data)
+		return utils.RenderPage(c, partials, data)
 	})
-	
-	r.Run(":8080")
+
+	log.Fatal(app.Listen(":3000"))
 }
+
 /*
  * An attempt to consilidate data for template rendering
  */
-func buildPipeline() gin.H {
-	return gin.H{
+func buildPipeline() fiber.Map {
+	return fiber.Map{
 		"Tenant": "MC",
-		"Host": "Madrone Logistics",
+		"Host":   "Madrone Logistics",
 	}
 }
