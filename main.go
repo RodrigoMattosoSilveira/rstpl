@@ -5,10 +5,12 @@ import (
 
 	"github.com/RodrigoMattosoSilveira/rstpl/internal/utils"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
 	app := fiber.New()
+	app.Use(logger.New())
 
 	// Serve static assets if you have them (optional)
 	app.Static("/static", "./static")
@@ -48,8 +50,8 @@ func main() {
 	app.Get("/welcome_login", func(c *fiber.Ctx) error {
 		var partials = []utils.TmplPartial {
 			{Name: "layout", Fn: "layout.html", Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
-			{Name: "bottom", Fn: "welcome.html", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
-			{Name: "top", Fn: "cc.tmpl", Prefix: `{{ define "top" }}`, FullName: "", FileStr: ""},
+			{Name: "top", Fn: "welcome.html", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
+			{Name: "bottom",    Fn: "cc.tmpl", Prefix: `{{ define "top" }}`, FullName: "", FileStr: ""},
 		}
 
 		// Call our custom renderer.
