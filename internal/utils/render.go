@@ -3,12 +3,11 @@ package utils
 import (
 	"html/template"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"sync"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
 // Helper: renders a view with layout and partials
@@ -20,33 +19,33 @@ var templateCache = struct {
 	data: make(map[string]*template.Template),
 }
 
-func Render(c *gin.Context, partial string, data gin.H) {
+func Render(c *fiber.Ctx, partial string, data fiber.Map) error {
 	var layout string
-	var layoutName string
-	route := c.FullPath()
+	// var layoutName string
+	route := c.Path()
 
 	switch route {
 	case "/":
 		layout = "layout.html"
-		layoutName = "layout"
+		// layoutName = "layout"
 	case "/about":
 		layout = "layout.html"
-		layoutName = "layout"
+		// layoutName = "layout"
 	case "/welcome":
 		layout = "body.html"
-		layoutName = "body"
+		// layoutName = "body"
 	case "/bemvindo":
 		layout = "body.html"
-		layoutName = "body"
+		// layoutName = "body"
 	case "/login":
 		layout = "body.html"
-		layoutName = "body"
+		// layoutName = "body"
 	case "/logon":
 		layout = "body.html"
-		layoutName = "body"
+		// layoutName = "body"
 	default:
 		layout = "layout.html"
-		layoutName = "layout"
+		// layoutName = "layout"
 	}
 	// Key for cache
 	key := layout + "|" + partial
@@ -67,34 +66,40 @@ func Render(c *gin.Context, partial string, data gin.H) {
 		templateCache.mu.Unlock()
 	}
 
-	// Execute template using its defined name (not filename)
-	c.Status(http.StatusOK)
-	if err := t.ExecuteTemplate(c.Writer, layoutName, data); err != nil {
-		c.String(http.StatusInternalServerError, "template error: %v", err)
-	}
+		// Execute template into the response body
+		// Use c.Response().BodyWriter() so template writes directly to Fiber response
+		err := t.Execute(c.Response().BodyWriter(), data)
+		if err != nil {
+			return err
+		}
+
+		// Set content type
+		c.Type("html")
+		return nil
+
 }
 
 type TmplPartial struct {
-	Prefix string
-	Fn string
+	Prefix   string
+	Fn       string
 	FullName string
-	FileStr string
-	Name string
+	FileStr  string
+	Name     string
 }
 
-func RenderPage(c *gin.Context, partials []TmplPartial, data gin.H) {
+func RenderPage(c *fiber.Ctx, partials []TmplPartial, data fiber.Map) error {
 
 	projectRoot, err := FindProjectRoot()
 	if err != nil {
-		log.Printf("ERROR: Failed to find project root: %v", err)
-		c.AbortWithStatus(500)
-		return
+		log.Printf("ERROR: Failed to find project root: %v", err)		
+		// c.AbortWithStatus(500)
+		return err
 	}
 
 	var partialsStr []string
 	for _, partial := range partials {
 		partial.FullName = filepath.Join(projectRoot, "templates", partial.Fn)
-		partialsStr = append(partialsStr,  ReadTemplateFile(partial))
+		partialsStr = append(partialsStr, ReadTemplateFile(partial))
 	}
 
 	tmpl := template.New("layout")
@@ -112,11 +117,17 @@ func RenderPage(c *gin.Context, partials []TmplPartial, data gin.H) {
 	// 	log.Fatal(err)
 	// }
 
-	err = tmpl.Execute(c.Writer, data)
+	// Execute template into the response body
+	// Use c.Response().BodyWriter() so template writes directly to Fiber response
+	err = tmpl.Execute(c.Response().BodyWriter(), data)
 	if err != nil {
 		log.Printf("ERROR: Failed to execute template '%s': %v", "layout", err)
-		c.AbortWithStatus(500)
+	return err
 	}
+
+	// Set content type
+	c.Type("html")
+	return nil
 }
 
 func ReadTemplateFile(tmpl TmplPartial) string {
@@ -127,12 +138,12 @@ func ReadTemplateFile(tmpl TmplPartial) string {
 	}
 	// templateStr := tmpl.Prefix + string(content) + "\n" + "{{ end }}"
 	// templateStr := "\n" + tmpl.Prefix + "\n" + string(content)+ "\n"  + "{{ end }}"
-	templateStr := derivePrefix(tmpl.Name) + string(content)+ "\n"  + "{{ end }}"
+	templateStr := derivePrefix(tmpl.Name) + string(content) + "\n" + "{{ end }}"
 	log.Println(templateStr)
 	return templateStr
 }
 
 func derivePrefix(name string) string {
 	// Prefix: `{{ define "bottom" }}`
-	return  "\n" +  `{{ define "` + name + `" }}`+ "\n"
+	return "\n" + `{{ define "` + name + `" }}` + "\n"
 }
