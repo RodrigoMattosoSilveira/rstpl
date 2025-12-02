@@ -166,8 +166,13 @@
 
   <!-- Main Content -->
   <main class="container-fluid">
-    {{ block "top" . }}Default top {{ end }}
-    {{ block "bottom" . }}Default bottom {{ end }}
+
+    <!-- Dynamic combo execution -->
+    {{ template "combo_dynamic" . }}
+
+    <!-- Page body -->
+    {{ template "body" . }}
+
   </main>
 
   <!-- Footer -->
