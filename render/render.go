@@ -24,10 +24,6 @@ func GenerateCombo(name string, templates []string) string {
 
     return b.String()
 }
-
-/*
- * Navigates and parses the template in the template root folder 
- */
 func LoadTemplates(tmplRoot string, tmplExt string) *template.Template {
     root := template.New("")
 

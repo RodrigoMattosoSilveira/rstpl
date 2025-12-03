@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-
 	"github.com/RodrigoMattosoSilveira/rstpl/internal/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -77,6 +76,19 @@ func main() {
 		tmpl.Parse(comboSrc)
 
 		return tmpl.ExecuteTemplate(w, "combo_dynamic", data)
+    })
+    app.Get("/chatt", func(c *fiber.Ctx) error {
+		c.Type("html")
+		data := map[string]any{
+			"List": []string{"partials/A", "partials/B", "body"},
+		}
+
+		w := c.Response().BodyWriter()
+
+		comboSrc := render.GenerateCombo("combo_dynamic", []string{"partials/A", "partials/B", "body"})
+		tmpl.Parse(comboSrc)
+
+		return tmpl.ExecuteTemplate(w, "layout", data)
     })
 
 	log.Fatal(app.Listen(":3000"))
