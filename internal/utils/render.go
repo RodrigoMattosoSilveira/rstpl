@@ -19,57 +19,6 @@ var templateCache = struct {
 	data: make(map[string]*template.Template),
 }
 
-func Render(c *fiber.Ctx, partial string, data fiber.Map) error {
-	var layout string
-	// var layoutName string
-	route := c.Path()
-
-	switch route {
-	case "/":
-		layout = "layout.html"
-		// layoutName = "layout"
-	case "/about":
-		layout = "layout.html"
-		// layoutName = "layout"
-	case "/welcome":
-		layout = "body.html"
-		// layoutName = "body"
-	case "/bemvindo":
-		layout = "body.html"
-		// layoutName = "body"
-	case "/login":
-		layout = "body.html"
-		// layoutName = "body"
-	case "/logon":
-		layout = "body.html"
-		// layoutName = "body"
-	default:
-		layout = "layout.html"
-		// layoutName = "layout"
-	}
-	// Key for cache
-	key := layout + "|" + partial
-
-	// Try cached template
-	templateCache.mu.RLock()
-	t, ok := templateCache.data[key]
-	templateCache.mu.RUnlock()
-
-	if !ok {
-		files := []string{
-			filepath.Join("templates", layout),
-			filepath.Join("templates", partial),
-		}
-		t = template.Must(template.ParseFiles(files...))
-		templateCache.mu.Lock()
-		templateCache.data[key] = t
-		templateCache.mu.Unlock()
-	}
-
-	c.Type("html", "utf-8")
-	return t.Execute(c.Response().BodyWriter(), data)
-}
-
 type TmplPartial struct {
 	Prefix   string
 	Fn       string
@@ -87,10 +36,15 @@ func RenderPage(c *fiber.Ctx, partials []TmplPartial, data fiber.Map) error {
 		return err
 	}
 
+	// TODO add caching mechanism here
+
+	// 3. Parse the templates.
 	var partialsStr []string
+	partialsStrKey := ""
 	for _, partial := range partials {
 		partial.FullName = filepath.Join(projectRoot, "templates", partial.Fn)
 		partialsStr = append(partialsStr, ReadTemplateFile(partial))
+		partialsStrKey += partial.FullName
 	}
 
 	tmpl := template.New("layout")

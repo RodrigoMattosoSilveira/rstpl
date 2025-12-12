@@ -35,8 +35,8 @@ func main() {
 
 	app.Get("/login", func(c *fiber.Ctx) error {
 		var partials = []utils.TmplPartial {
-			{Name: "layout", Fn: "layout.html", Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
-			{Name: "top", Fn: "login.html", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
+			{Name: "layout", Fn: "layout.html", },
+			{Name: "top", Fn: "login.html", },
 		}
 
 		// Call our custom renderer.
