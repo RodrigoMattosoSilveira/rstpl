@@ -2,17 +2,15 @@ package main
 
 import (
 	"log"
+
 	"github.com/RodrigoMattosoSilveira/rstpl/internal/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-
-	"github.com/RodrigoMattosoSilveira/rstpl/render"
 )
 
 func main() {
 	app := fiber.New()
 	app.Use(logger.New())
-    tmpl := render.LoadTemplates("templates", "html")
 
 	// Serve static assets if you have them (optional)
 	app.Static("/static", "./static")
@@ -42,7 +40,7 @@ func main() {
 	})
 
 	app.Get("/login", func(c *fiber.Ctx) error {
-		return utils.Render(c, "lofiber.Maptml", buildPipeline())
+		return utils.Render(c, "login.html", buildPipeline())
 	})
 
 	app.Get("/logon", func(c *fiber.Ctx) error {
@@ -64,32 +62,6 @@ func main() {
 		}
 		return utils.RenderPage(c, partials, data)
 	})
-    app.Get("/chat", func(c *fiber.Ctx) error {
-		c.Type("html")
-		data := map[string]any{
-			"List": []string{"partials/A", "partials/B", "body"},
-		}
-
-		w := c.Response().BodyWriter()
-
-		comboSrc := render.GenerateCombo("combo_dynamic", []string{"partials/A", "partials/B", "body"})
-		tmpl.Parse(comboSrc)
-
-		return tmpl.ExecuteTemplate(w, "combo_dynamic", data)
-    })
-    app.Get("/chatt", func(c *fiber.Ctx) error {
-		c.Type("html")
-		data := map[string]any{
-			"List": []string{"partials/A", "partials/B", "body"},
-		}
-
-		w := c.Response().BodyWriter()
-
-		comboSrc := render.GenerateCombo("combo_dynamic", []string{"partials/A", "partials/B", "body"})
-		tmpl.Parse(comboSrc)
-
-		return tmpl.ExecuteTemplate(w, "layout", data)
-    })
 
 	log.Fatal(app.Listen(":3000"))
 }

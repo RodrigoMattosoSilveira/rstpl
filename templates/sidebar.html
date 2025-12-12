@@ -1,0 +1,16 @@
+{{ define "sidebar" }}
+<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="sidebarLabel">Navigation</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item"><i class="bi bi-house me-2"></i><a href="/">Home</a></li>
+      <li class="list-group-item"><i class="bi bi-person me-2"></i><a href="#">Profile</a></li>
+      <li class="list-group-item"><i class="bi bi-gear me-2"></i><a href="#">Settings</a></li>
+      <li class="list-group-item"><i class="bi bi-question-circle me-2"></i><a href="#">Help</a></li>
+    </ul>
+  </div>
+</div>
+{{ end }}
