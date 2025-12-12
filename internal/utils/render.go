@@ -66,17 +66,8 @@ func Render(c *fiber.Ctx, partial string, data fiber.Map) error {
 		templateCache.mu.Unlock()
 	}
 
-		// Execute template into the response body
-		// Use c.Response().BodyWriter() so template writes directly to Fiber response
-		err := t.Execute(c.Response().BodyWriter(), data)
-		if err != nil {
-			return err
-		}
-
-		// Set content type
-		c.Type("html")
-		return nil
-
+	c.Type("html", "utf-8")
+	return t.Execute(c.Response().BodyWriter(), data)
 }
 
 type TmplPartial struct {
@@ -119,15 +110,8 @@ func RenderPage(c *fiber.Ctx, partials []TmplPartial, data fiber.Map) error {
 
 	// Execute template into the response body
 	// Use c.Response().BodyWriter() so template writes directly to Fiber response
-	err = tmpl.Execute(c.Response().BodyWriter(), data)
-	if err != nil {
-		log.Printf("ERROR: Failed to execute template '%s': %v", "layout", err)
-	return err
-	}
-
-	// Set content type
-	c.Type("html")
-	return nil
+	c.Type("html", "utf-8")
+	return tmpl.Execute(c.Response().BodyWriter(), data)
 }
 
 func ReadTemplateFile(tmpl TmplPartial) string {

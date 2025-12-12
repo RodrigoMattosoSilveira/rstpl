@@ -50,8 +50,8 @@ func main() {
 	app.Get("/welcome_login", func(c *fiber.Ctx) error {
 		var partials = []utils.TmplPartial {
 			{Name: "layout", Fn: "layout.html", Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
-			{Name: "top", Fn: "welcome.html", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
-			{Name: "bottom",    Fn: "cc.tmpl", Prefix: `{{ define "top" }}`, FullName: "", FileStr: ""},
+			{Name: "top", Fn: "cc.tmpl", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
+			{Name: "bottom",    Fn: "welcome.html", Prefix: `{{ define "top" }}`, FullName: "", FileStr: ""},
 		}
 
 		// Call our custom renderer.
