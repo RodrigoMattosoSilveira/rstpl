@@ -16,38 +16,8 @@ func main() {
 	app.Static("/static", "./static")
 
 	// Routes
+
 	app.Get("/", func(c *fiber.Ctx) error {
-		utils.Render(c, "home.html", fiber.Map{
-			"Title":   "Home",
-			"ShowNav": true,
-		})
-		return nil
-	})
-
-	app.Get("/about", func(c *fiber.Ctx) error {
-		return utils.Render(c, "about.html", fiber.Map{
-			"Title":   "Home",
-			"ShowNav": true,
-		})
-	})
-
-	app.Get("/welcome", func(c *fiber.Ctx) error {
-		return utils.Render(c, "welcome.html", buildPipeline())
-	})
-
-	app.Get("/bemvindo", func(c *fiber.Ctx) error {
-		return utils.Render(c, "bemvindo.html", buildPipeline())
-	})
-
-	app.Get("/login", func(c *fiber.Ctx) error {
-		return utils.Render(c, "login.html", buildPipeline())
-	})
-
-	app.Get("/logon", func(c *fiber.Ctx) error {
-		return utils.Render(c, "logon.html", buildPipeline())
-	})
-
-	app.Get("/welcome_login", func(c *fiber.Ctx) error {
 		var partials = []utils.TmplPartial {
 			{Name: "layout", Fn: "layout.html", Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
 			{Name: "top", Fn: "cc.tmpl", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
