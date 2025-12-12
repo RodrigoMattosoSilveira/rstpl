@@ -33,6 +33,20 @@ func main() {
 		return utils.RenderPage(c, partials, data)
 	})
 
+	app.Get("/login", func(c *fiber.Ctx) error {
+		var partials = []utils.TmplPartial {
+			{Name: "layout", Fn: "layout.html", Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
+			{Name: "top", Fn: "login.html", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
+		}
+
+		// Call our custom renderer.
+		// The name "layout.tmpl" tells the template engine which template definition to execute first.
+		data := fiber.Map{
+			"Tenant": "MC",
+			"Host":   "Madone Logistics",
+		}
+		return utils.RenderPage(c, partials, data)
+	})
 	log.Fatal(app.Listen(":3000"))
 }
 
