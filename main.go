@@ -17,7 +17,7 @@ func main() {
 
 	// Routes
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/welcome", func(c *fiber.Ctx) error {
 		var partials = []utils.TmplPartial {
 			{Name: "layout", Fn: "layout.html", },  // Must be the first one
 			{Name: "top", Fn: "cc.tmpl", },
@@ -26,12 +26,8 @@ func main() {
 
 		// Call our custom renderer.
 		// The name "layout.tmpl" tells the template engine which template definition to execute first.
-		data := fiber.Map{
-			"Tenant": "MC",
-			"Host":   "Madone Logistics",
-		}
-		return utils.RenderPage(c, partials, data)
-	})
+		return utils.RenderPage(c, partials, buildPipeline())
+	}).Name("welcome")
 
 	app.Get("/login", func(c *fiber.Ctx) error {
 		var partials = []utils.TmplPartial {
@@ -41,11 +37,13 @@ func main() {
 
 		// Call our custom renderer.
 		// The name "layout.tmpl" tells the template engine which template definition to execute first.
-		data := fiber.Map{
-			"Tenant": "MC",
-			"Host":   "Madone Logistics",
-		}
-		return utils.RenderPage(c, partials, data)
+		return utils.RenderPage(c, partials, buildPipeline())
+	})
+
+	app.Post("/login", func(c *fiber.Ctx) error {
+		log.Println("Login attempt:", c.FormValue("username"))
+		// In a real app, you'd validate credentials here.
+		return c.Redirect("/welcome")
 	})
 	log.Fatal(app.Listen(":3000"))
 }

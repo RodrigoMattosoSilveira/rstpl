@@ -79,7 +79,7 @@ func readTemplateFile(tmpl TmplPartial) string {
 	// templateStr := tmpl.Prefix + string(content) + "\n" + "{{ end }}"
 	// templateStr := "\n" + tmpl.Prefix + "\n" + string(content)+ "\n"  + "{{ end }}"
 	templateStr := derivePrefix(tmpl.Name) + string(content) + "\n" + "{{ end }}"
-	log.Println(templateStr)
+	// log.Println(templateStr)
 	return templateStr
 }
 
