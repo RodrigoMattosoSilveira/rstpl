@@ -17,7 +17,12 @@ func main() {
 
 	// Routes
 
-	app.Get("/welcome", func(c *fiber.Ctx) error {
+	app.Get("/welcome/:id", func(c *fiber.Ctx) error {
+		id, err :=c.ParamsInt("id")
+		if err != nil {
+			log.Printf("Invalid id: %d", id)
+			c.Redirect("/login")
+		}
 		var partials = []utils.TmplPartial {
 			{Name: "layout", Fn: "layout.html", },  // Must be the first one
 			{Name: "top", Fn: "cc.tmpl", },
@@ -43,7 +48,7 @@ func main() {
 	app.Post("/login", func(c *fiber.Ctx) error {
 		log.Println("Login attempt:", c.FormValue("username"))
 		// In a real app, you'd validate credentials here.
-		return c.Redirect("/welcome")
+		return c.Redirect("/welcome/1")
 	})
 	log.Fatal(app.Listen(":3000"))
 }
