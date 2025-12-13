@@ -19,9 +19,9 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		var partials = []utils.TmplPartial {
-			{Name: "layout", Fn: "layout.html", Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
-			{Name: "top", Fn: "cc.tmpl", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
-			{Name: "bottom",    Fn: "welcome.html", Prefix: `{{ define "top" }}`, FullName: "", FileStr: ""},
+			{Name: "layout", Fn: "layout.html", },  // Must be the first one
+			{Name: "top", Fn: "cc.tmpl", },
+			{Name: "bottom",    Fn: "welcome.html", },
 		}
 
 		// Call our custom renderer.
@@ -35,7 +35,7 @@ func main() {
 
 	app.Get("/login", func(c *fiber.Ctx) error {
 		var partials = []utils.TmplPartial {
-			{Name: "layout", Fn: "layout.html", },
+			{Name: "layout", Fn: "layout.html", }, // Must be the first one
 			{Name: "top", Fn: "login.html", },
 		}
 
