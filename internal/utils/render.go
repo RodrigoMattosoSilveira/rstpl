@@ -19,63 +19,10 @@ var templateCache = struct {
 	data: make(map[string]*template.Template),
 }
 
-func Render(c *fiber.Ctx, partial string, data fiber.Map) error {
-	var layout string
-	// var layoutName string
-	route := c.Path()
-
-	switch route {
-	case "/":
-		layout = "layout.html"
-		// layoutName = "layout"
-	case "/about":
-		layout = "layout.html"
-		// layoutName = "layout"
-	case "/welcome":
-		layout = "body.html"
-		// layoutName = "body"
-	case "/bemvindo":
-		layout = "body.html"
-		// layoutName = "body"
-	case "/login":
-		layout = "body.html"
-		// layoutName = "body"
-	case "/logon":
-		layout = "body.html"
-		// layoutName = "body"
-	default:
-		layout = "layout.html"
-		// layoutName = "layout"
-	}
-	// Key for cache
-	key := layout + "|" + partial
-
-	// Try cached template
-	templateCache.mu.RLock()
-	t, ok := templateCache.data[key]
-	templateCache.mu.RUnlock()
-
-	if !ok {
-		files := []string{
-			filepath.Join("templates", layout),
-			filepath.Join("templates", partial),
-		}
-		t = template.Must(template.ParseFiles(files...))
-		templateCache.mu.Lock()
-		templateCache.data[key] = t
-		templateCache.mu.Unlock()
-	}
-
-	c.Type("html", "utf-8")
-	return t.Execute(c.Response().BodyWriter(), data)
-}
-
 type TmplPartial struct {
-	Prefix   string
 	Fn       string
-	FullName string
-	FileStr  string
 	Name     string
+	FullName string
 }
 
 func RenderPage(c *fiber.Ctx, partials []TmplPartial, data fiber.Map) error {
@@ -87,26 +34,35 @@ func RenderPage(c *fiber.Ctx, partials []TmplPartial, data fiber.Map) error {
 		return err
 	}
 
+	// TODO add caching mechanism here
+
+	// 3. Parse the templates.
 	var partialsStr []string
+	partialsStrKey := ""
 	for _, partial := range partials {
 		partial.FullName = filepath.Join(projectRoot, "templates", partial.Fn)
-		partialsStr = append(partialsStr, ReadTemplateFile(partial))
+		partialsStr = append(partialsStr, readTemplateFile(partial))
+		partialsStrKey += partial.FullName
 	}
 
-	tmpl := template.New("layout")
+	// Check cache first
+	if cachedTmpl, exists := getCachedTemplate(partialsStrKey); exists {
+		// Execute cached template into the response body
+		c.Type("html", "utf-8")
+		return cachedTmpl.Execute(c.Response().BodyWriter(), data)
+	}
+
+	// Not in cache, parse anew and cache it
+	var tmpl *template.Template			
+	tmpl = template.New("layout")
 	for _, part := range partialsStr {
 		tmpl, err = tmpl.Parse(part)
 		if err != nil {
 			log.Fatal(err)
 		}
 	}
-
-	// 4. Execute the template.
-	// Send it to console to debug
-	// err = tmpl.ExecuteTemplate(os.Stdout, "layout", data)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	// Cache the parsed template
+	cacheTemplate(partialsStrKey, tmpl)
 
 	// Execute template into the response body
 	// Use c.Response().BodyWriter() so template writes directly to Fiber response
@@ -114,7 +70,7 @@ func RenderPage(c *fiber.Ctx, partials []TmplPartial, data fiber.Map) error {
 	return tmpl.Execute(c.Response().BodyWriter(), data)
 }
 
-func ReadTemplateFile(tmpl TmplPartial) string {
+func readTemplateFile(tmpl TmplPartial) string {
 	// Read the file into a byte slice, then convert to string
 	content, err := os.ReadFile(tmpl.FullName)
 	if err != nil {
@@ -123,11 +79,26 @@ func ReadTemplateFile(tmpl TmplPartial) string {
 	// templateStr := tmpl.Prefix + string(content) + "\n" + "{{ end }}"
 	// templateStr := "\n" + tmpl.Prefix + "\n" + string(content)+ "\n"  + "{{ end }}"
 	templateStr := derivePrefix(tmpl.Name) + string(content) + "\n" + "{{ end }}"
-	log.Println(templateStr)
+	// log.Println(templateStr)
 	return templateStr
 }
 
 func derivePrefix(name string) string {
 	// Prefix: `{{ define "bottom" }}`
 	return "\n" + `{{ define "` + name + `" }}` + "\n"
+}
+
+func getCachedTemplate(key string) (*template.Template, bool) {
+	templateCache.mu.RLock()
+	tmpl, exists := templateCache.data[key]
+	templateCache.mu.RUnlock()
+	
+	return tmpl, exists
+}
+
+
+func cacheTemplate(key string, tmpl *template.Template) {
+	templateCache.mu.Lock()
+	templateCache.data[key] = tmpl
+	templateCache.mu.Unlock()
 }

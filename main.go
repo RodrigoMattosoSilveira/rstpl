@@ -16,53 +16,40 @@ func main() {
 	app.Static("/static", "./static")
 
 	// Routes
-	app.Get("/", func(c *fiber.Ctx) error {
-		utils.Render(c, "home.html", fiber.Map{
-			"Title":   "Home",
-			"ShowNav": true,
-		})
-		return nil
-	})
 
-	app.Get("/about", func(c *fiber.Ctx) error {
-		return utils.Render(c, "about.html", fiber.Map{
-			"Title":   "Home",
-			"ShowNav": true,
-		})
-	})
-
-	app.Get("/welcome", func(c *fiber.Ctx) error {
-		return utils.Render(c, "welcome.html", buildPipeline())
-	})
-
-	app.Get("/bemvindo", func(c *fiber.Ctx) error {
-		return utils.Render(c, "bemvindo.html", buildPipeline())
-	})
-
-	app.Get("/login", func(c *fiber.Ctx) error {
-		return utils.Render(c, "login.html", buildPipeline())
-	})
-
-	app.Get("/logon", func(c *fiber.Ctx) error {
-		return utils.Render(c, "logon.html", buildPipeline())
-	})
-
-	app.Get("/welcome_login", func(c *fiber.Ctx) error {
+	app.Get("/welcome/:id", func(c *fiber.Ctx) error {
+		id, err :=c.ParamsInt("id")
+		if err != nil {
+			log.Printf("Invalid id: %d", id)
+			c.Redirect("/login")
+		}
 		var partials = []utils.TmplPartial {
-			{Name: "layout", Fn: "layout.html", Prefix: `{{ define "layout" }}`, FullName: "", FileStr: ""},
-			{Name: "top", Fn: "cc.tmpl", Prefix: `{{ define "bottom" }}`, FullName: "", FileStr: ""},
-			{Name: "bottom",    Fn: "welcome.html", Prefix: `{{ define "top" }}`, FullName: "", FileStr: ""},
+			{Name: "layout", Fn: "layout.html", },  // Must be the first one
+			{Name: "top", Fn: "cc.tmpl", },
+			{Name: "bottom",    Fn: "welcome.html", },
 		}
 
 		// Call our custom renderer.
 		// The name "layout.tmpl" tells the template engine which template definition to execute first.
-		data := fiber.Map{
-			"Tenant": "MC",
-			"Host":   "Madone Logistics",
+		return utils.RenderPage(c, partials, buildPipeline())
+	}).Name("welcome")
+
+	app.Get("/login", func(c *fiber.Ctx) error {
+		var partials = []utils.TmplPartial {
+			{Name: "layout", Fn: "layout.html", }, // Must be the first one
+			{Name: "top", Fn: "login.html", },
 		}
-		return utils.RenderPage(c, partials, data)
+
+		// Call our custom renderer.
+		// The name "layout.tmpl" tells the template engine which template definition to execute first.
+		return utils.RenderPage(c, partials, buildPipeline())
 	})
 
+	app.Post("/login", func(c *fiber.Ctx) error {
+		log.Println("Login attempt:", c.FormValue("username"))
+		// In a real app, you'd validate credentials here.
+		return c.Redirect("/welcome/1")
+	})
 	log.Fatal(app.Listen(":3000"))
 }
 
